@@ -6,30 +6,53 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class PhoneBook extends Frame {
-    BorderLayout manager = new BorderLayout();
-    Button button_ok = new Button("Ok");
-    Button button_add = new Button("Add record");
+
+    public java.awt.List data_list;
     
     public PhoneBook (String title) {
         super(title);
         try {
-            init();
+            BorderLayout manager = new BorderLayout();
+            Label number_label = new Label("Number: ");
+            Label surname_label = new Label ("Surname:");
+            setLayout(manager);
+            setSize(500, 300);
+            setLocationRelativeTo(null);
+            setResizable(false);
+
+            // Создаем панель с полем "Number"
+            Panel panel = new Panel();
+            panel.add(number_label);
+            TextField number_field = (TextField) panel.add(new TextField(15));
+
+            // Создаем надпись и поле "Surname"
+            panel.add(surname_label);
+            TextField surname_field = new TextField();
+            surname_field = (TextField) panel.add(new TextField(15));
+
+            // Создаем кнопку "Add"
+            Component add_button = panel.add(new Button("Add"));
+            add (panel, BorderLayout.NORTH);
+
+            // Создаем новую панель и добавляем туда список
+            panel = new Panel();
+            this.data_list = new java.awt.List(10);
+            panel.add(data_list);
+            add(panel, BorderLayout.CENTER);
+
+
+            Button button_ok = new Button("Ok");
+            Button button_add = new Button("Add record");
+            addWindowListener(new MyWindowAdapter());
         }
         catch(Exception e) {
             e.printStackTrace();
         }
     }
      
-    private void init() throws Exception {
-        setLayout(manager);
-        setSize(500, 300);
-        setLocationRelativeTo(null);
-        setResizable(false);
-        addWindowListener(new MyWindowAdapter());
-    }
-    
-    static private void refresh_list(Map phonebook, java.awt.List data_list){
+    private static void refresh_list(Map phonebook, java.awt.List data_list){
         Set<Map.Entry<String, String>> set = phonebook.entrySet();
+        data_list.clear();
         for (Map.Entry<String, String> me : set){
             data_list.add(me.getKey()+"  "+me.getValue());
         }
@@ -78,39 +101,8 @@ public class PhoneBook extends Frame {
 
         // Создаем объект окна
         PhoneBook frame = new PhoneBook("Phone book");
-        Panel panel = new Panel();
-
-        // Создаем надпись и поле "Number"
-        Label number_label = new Label ("Number:");
-        panel.add(number_label);
-        TextField number_field = new TextField();
-        number_field = (TextField) panel.add(new TextField(15));
-
-        // Создаем надпись и поле "Surname"
-        Label surname_label = new Label ("Surname:");
-        panel.add(surname_label);
-        TextField surname_field = new TextField();
-        surname_field = (TextField) panel.add(new TextField(15));
-
-        // Создаем кнопку "Add"
-        Component add_button = panel.add(new Button("Add"));
-        frame.add (panel, BorderLayout.NORTH);
-
-        // Создаем новую панель и добавляем туда список
-        panel = new Panel();
-        java.awt.List data_list;
-        data_list = new java.awt.List(10);
-        panel.add(data_list);
-        frame.add(panel, BorderLayout.CENTER);
-        
-        panel = new Panel();
-        Component test_button2 = panel.add(new Button("Test2"));
-        Component test_button3 = panel.add(new Button("Test3"));
-        frame.add (panel, BorderLayout.SOUTH);
-
+        refresh_list(phonebook, frame.data_list);
         frame.setVisible(true);
-        
-        refresh_list(phonebook, data_list);
         
         
     }
