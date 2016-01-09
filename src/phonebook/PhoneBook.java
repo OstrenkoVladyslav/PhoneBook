@@ -1,4 +1,14 @@
 // https://github.com/OstrenkoVladyslav/PhoneBook.git
+/*
+Приложение для создания справочника телефонов.
+Справочник phonebook типа HashMap с полями number_field (ключ)
+и surname_field (значение).
+Реализуется вывод в стандартный поток элементов справочника, поиск абонента
+по номеру телефона и по фамилии.
+В окне программы предусмотрено добавление новой записи в справочник.
+Валидация полей не реализована.
+*/
+
 package phonebook;
 
 import java.util.*;
@@ -7,64 +17,74 @@ import java.awt.event.*;
 
 public class PhoneBook extends Frame {
 
-    protected java.awt.List data_list = new java.awt.List();
-    protected HashMap phonebook = new HashMap();
+    java.awt.List data_list = new java.awt.List();
+    HashMap phonebook = new HashMap();
     Panel panel1, panel2, panel3;
-    protected TextField number_field = new TextField();
-    protected TextField surname_field = new TextField();
-    //protected Label number_label, surname_label;
+    TextField number_field = new TextField();
+    TextField surname_field = new TextField();
+    Button add_button  = new Button("Add");
+    Button ok_button  = new Button("OK");
+    AddListener add_record_listener = new AddListener();
+    CloseListener close_listener = new CloseListener();
     
+
     public PhoneBook (String title) {
         super(title);
         this.phonebook = new HashMap();
         this.panel1 = new Panel();
         this.panel2 = new Panel();
+        this.panel3 = new Panel();
         Label number_label = new Label("Number: ");
         Label surname_label = new Label("Surname: ");
-        //this.TextField number_field = new TextField();
-        //this.TextField surname_field = new TextField();
+        //this.add_button = new Button();
+        BorderLayout manager = new BorderLayout();
+        setLayout(manager);
+        setSize(500, 300);
+        setLocationRelativeTo(null);
+        setResizable(true);
+
+        // Создаем надпись и текстовое поле "Number"
+        panel1.add(number_label);
+        number_field = (TextField) panel1.add(new TextField(15));
+
+        // Создаем надпись и текстовое поле "Surname"
+        panel1.add(surname_label);
+        surname_field = (TextField) panel1.add(new TextField(15));
+
+        // Добавляем кнопку "Add"
+        add_button.addActionListener(add_record_listener);
+        panel1.add(add_button);
+        add (panel1, BorderLayout.NORTH);
+
+        // Создаем новую панель и добавляем туда список
+        Panel panel2 = new Panel();
+        this.data_list = new java.awt.List(10);
+        panel2.add(data_list);
+        add(panel2, BorderLayout.CENTER);
         
-        try {
-            BorderLayout manager = new BorderLayout();
-            setLayout(manager);
-            setSize(500, 300);
-            setLocationRelativeTo(null);
-            setResizable(true);
-
-            // Создаем панель с полем "Number"
-            panel1.add(number_label);
-            number_field = (TextField) panel1.add(new TextField("0506543210",15));
-            //number_field.setText("0505556677");
-
-            // Создаем надпись и поле "Surname"
-            panel1.add(surname_label);
-            surname_field = (TextField) panel1.add(new TextField("Zatulovsky",15));
-            //surname_field.setText("Zatulovsky");
-
-            // Создаем кнопку "Add"
-            Button add_button = (Button) panel1.add(new Button("Add"));
-            add (panel1, BorderLayout.NORTH);
-
-            // Создаем новую панель и добавляем туда список
-            Panel panel2 = new Panel();
-            this.data_list = new java.awt.List(10);
-            panel2.add(data_list);
-            add(panel2, BorderLayout.CENTER);
-
-            Button button_ok = new Button("Ok");
-            Button button_add = new Button("Add record");
-
-            //Создадим слушателей
-            
-
-            addWindowListener(new MyWindowAdapter());
-        }
-        catch(Exception e) {
-            e.printStackTrace();
+        // Добавляем кнопку ОК
+        ok_button.addActionListener(close_listener);
+        panel3.add(ok_button);
+        add (panel3, BorderLayout.SOUTH);
+        
+        addWindowListener(new MyWindowAdapter());
+    }
+    
+    class AddListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            add_record(PhoneBook.this);
+            refresh_list(PhoneBook.this);
         }
     }
-     
-    public static void refresh_list(PhoneBook frame){
+
+    class CloseListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            System.exit(0);
+        }
+    }    
+    
+    
+    public void refresh_list(PhoneBook frame){
         Set<Map.Entry<String, String>> set = frame.phonebook.entrySet();
         frame.data_list.clear();
         for (Map.Entry<String, String> me : set){
@@ -73,11 +93,8 @@ public class PhoneBook extends Frame {
         frame.data_list.setVisible(true);
     }
     
-    public void add_record(){
-        String number = this.number_field.getText();
-        String surname = surname_field.getText();
-        this.phonebook.put(number,surname);
-        //phonebook.put("0505554433","Putin");
+    public void add_record(PhoneBook frame){
+        frame.phonebook.put(frame.number_field.getText(),frame.surname_field.getText());
     }
     
     class MyWindowAdapter extends WindowAdapter {
@@ -86,21 +103,13 @@ public class PhoneBook extends Frame {
             System.exit(0);
         }
     }
-    
-    class AddRecordListener implements ActionListener{
-        public void actionPerformed(ActionEvent e) {
-            //phonebook.put(number_field.getText(),);
-            PhoneBook.add_record();
-            refresh_list();
-        }
         
-    }
-    
     /**
      *
      * @param args
      */
     public static void main(String[] args) {
+        // Создаем объект типа PhoneBook
         PhoneBook frame = new PhoneBook("PhoneBook application (©Ostrenko)");
         frame.phonebook.put("0503231014","Ostrenko");
         frame.phonebook.put("0505775705","Petrov");
@@ -118,7 +127,7 @@ public class PhoneBook extends Frame {
             System.out.println(me.getValue());
         }
         System.out.println("--------------------------------------");
-        // Finding surname by phone number
+        System.out.println("Finding surname by phone number");
         System.out.println("Owner of 0503231014 number is "+frame.phonebook.get("0503231014"));
         System.out.println("--------------------------------------");
 
@@ -132,14 +141,10 @@ public class PhoneBook extends Frame {
         System.out.println("--------------------------------------");
         System.out.println("Starting windowed program...");
 
-        // Создаем объект окна
-
-        frame.phonebook.put(frame.number_field.getText(),frame.surname_field.getText());
-        frame.phonebook.put("123456789","qwerty");
-        refresh_list(frame);
-
-        //add_record();
+        // Заполняем TextField значениями
+        frame.refresh_list(frame);
+        
+        // Делаем окно видимым
         frame.setVisible(true);
-
     }
 }
