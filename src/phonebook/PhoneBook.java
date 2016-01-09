@@ -109,7 +109,7 @@ public class PhoneBook extends Frame {
      * @param args
      */
     public static void main(String[] args) {
-        // Создаем объект типа PhoneBook
+        // Создаем объект класса PhoneBook
         PhoneBook frame = new PhoneBook("PhoneBook application (©Ostrenko)");
         frame.phonebook.put("0503231014","Ostrenko");
         frame.phonebook.put("0505775705","Petrov");
